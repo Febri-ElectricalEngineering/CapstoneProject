@@ -1,0 +1,11 @@
+               precision    recall  f1-score   support
+
+     business      0.980     0.980     0.980       102
+entertainment      1.000     0.987     0.993        77
+     politics      0.976     0.988     0.982        84
+        sport      1.000     1.000     1.000       102
+         tech      0.988     0.988     0.988        80
+
+     accuracy                          0.989       445
+    macro avg      0.989     0.989     0.989       445
+ weighted avg      0.989     0.989     0.989       445
