@@ -1,38 +1,35 @@
-Deteksi Hoaks Berita Indonesia + Ringkasan Netral (IBM Granite)
+## Project Overview
+Deteksi hoaks Bahasa Indonesia dengan pendekatan hybrid: TF-IDF + Logistic Regression (screening cepat) dan IBM Granite 3.1-3B Instruct (4-bit) untuk kasus “zona ragu”. Output akhir: klasifikasi HOAX/NON-HOAX, insight EDA, dan contoh summarization JSON-only.
 
-Project Overview
-- **Masalah**: Penyebaran hoaks berdampak pada opini publik.
-- **Tujuan**: Klasifikasi `HOAX` vs `NON-HOAX` dan pembuatan ringkasan netral 3–5 kalimat untuk membantu moderasi.
-- **Scope**: Teks pendek Bahasa Indonesia (tweet/teks), tanpa metadata pribadi.
+## Dataset
+- Sumber: (isi nama/daring Kaggle/sumber publik yang dipakai).
+- Lisensi: (cantumkan lisensi sumber).
+- Pembagian: train/valid/test dengan stratified split.
 
-Raw Dataset Link
-- GitHub: IDNHoaxCorpus (lihat folder `dataset/`).
+## Pipeline & Tools
+- Baseline: TF-IDF (1–2gram, 30k fitur) + LR (class_weight="balanced") + tuning threshold.
+- Hybrid: zona ragu **low=0.42, high=0.58**, kasus ragu → **IBM Granite 3.1-3B (4-bit)** few-shot (prompt **JSON-only**, ensemble header).
+- Artefak model & laporan tersimpan di `artifacts/`.
 
-Analysis Process
-1. EDA & pembersihan data (hapus URL, normalisasi sederhana)
-2. Baseline: TF‑IDF + Logistic Regression
-3. IBM Granite 3.1 3B (few‑shot) untuk klasifikasi (JSON output)
-4. IBM Granite 3.1 3B untuk summarization (JSON: `summary`, `key_claims`)
-5. Evaluasi: F1/precision/recall; ROUGE (opsional) + inspeksi manual
+## Cara Reproduksi (Colab + GitHub, tanpa Drive)
+1. Buka notebook `notebooks/Capstone_Hoax_ID.ipynb` di Colab.
+2. Jalankan sel persiapan data (unduh dataset publik) → split.
+3. Jalankan sel baseline LR → Granite → **Finalisasi HYBRID (LOCK)**.
+4. Artefak akan muncul di `./artifacts/` (siap commit).
 
-Insight & Findings (contoh)
-- Tema hoaks dominan: politik/kesehatan.
-- Ciri leksikal: klik-bait, modalitas tertentu.
-- *Error analysis*: kasus ambigu atau satire.
+## AI Support
+- IBM Granite 3.1-3B Instruct (4-bit) via HuggingFace Transformers untuk **few-shot classification** & **summarization** (JSON-only).
+- LR untuk high/low confidence; Granite hanya untuk ~25% “zona ragu” (efisien).
 
-Conclusion & Recommendations
-- Daftar kata kunci pemicu & aturan `flagging` awal.
-- Workflow moderasi: (1) klasifikasi → (2) prioritas review → (3) ringkasan untuk editor.
-- Rencana perawatan model/prompt bulanan.
+## Insight & Temuan
+- Dataset imbalanced (HOAX dominan) → thresholding + hybrid penting agar recall NON-HOAX tidak jatuh.
+- HYBRID meningkatkan keseimbangan metrik tanpa mengorbankan akurasi keseluruhan.
+- Lihat `artifacts/*report*.json` & CM PNG untuk detail per kelas.
 
-AI Support Explanation
-- **Granite 3.1 3B Instruct**: open, long context (128K), mendukung klasifikasi & summarization.
-- Prompt JSON-only untuk stabilitas parsing; suhu rendah untuk konsistensi.
-
-Cara Reproduksi (Colab)
-1. Aktifkan GPU di Colab, jalankan sel instalasi.
-2. Jalankan seluruh sel berurutan.
-3. Commit notebook via *File → Save a copy in GitHub*.
+## Rekomendasi
+- Perbanyak contoh **NON-HOAX** (kurangi bias).
+- Kalibrasi threshold berkala (drift).
+- Ekstensi multi-kelas (kategori topik hoaks).
 
 
 ## Notebooks
@@ -40,3 +37,4 @@ Cara Reproduksi (Colab)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Febri-ElectricalEngineering/CapstoneProject/blob/main/notebooks/01_eda.ipynb) 01 – EDA
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Febri-ElectricalEngineering/CapstoneProject/blob/main/notebooks/02_baseline_classification.ipynb) 02 – Baseline TF-IDF Classification
+
